@@ -1,7 +1,9 @@
-import { Component, OnInit, ElementRef, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectorRef, ViewChild, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDrop } from '@angular/cdk/drag-drop';
+import { ListItemDirective } from './list-item.directive';
+import { ActiveDescendantKeyManager } from '@angular/cdk/a11y';
 
-interface ListItem {
+export interface ListItem {
   id: number;
   name: string;
 }
@@ -11,8 +13,10 @@ interface ListItem {
   templateUrl: './favorite-food.component.html',
   styleUrls: ['./favorite-food.component.scss']
 })
-export class FavoriteFoodComponent implements OnInit {
+export class FavoriteFoodComponent implements AfterViewInit {
   @ViewChild('container') container: ElementRef;
+  @ViewChildren(ListItemDirective) listItems: QueryList<ListItemDirective>;
+  focusManager: ActiveDescendantKeyManager<ListItemDirective>;
   activeItem: ListItem;
   selected: ListItem[] = [
     { id: 1, name: 'Taco' },
@@ -31,59 +35,52 @@ export class FavoriteFoodComponent implements OnInit {
     { id: 11, name: 'Grøt' },
     { id: 12, name: 'Fårikål' },
   ];
-  constructor(private changeDetector: ChangeDetectorRef) { }
 
-  ngOnInit() {
+  ngAfterViewInit() {
+    this.focusManager = new ActiveDescendantKeyManager(this.listItems).withWrap().withTypeAhead();
   }
 
-  activateItem(item: ListItem) {
-    if (!this.activeItem) {
-      this.activeItem = item;
-    } else {
-      if (item.id === this.activeItem.id) {
+  keydownhandler(event: KeyboardEvent) {
+    if (event.code === 'Space' || event.code === 'Enter') {
+      if (this.activeItem === this.focusManager.activeItem.value) {
         this.activeItem = null;
       } else {
-        this.activeItem = item;
+        this.activeItem = this.focusManager.activeItem.value;
       }
+    } else if ((event.code === 'ArrowUp' || event.code === 'ArrowDown') && this.activeItem) {
+      this.moveItem(event);
     }
+    this.focusManager.onKeydown(event);
   }
 
-  moveItem(listName: 'selected' | 'available', item: ListItem, key: KeyboardEvent, el: CdkDrop) {
-    const list = listName === 'selected' ? this.selected : this.available;
-    if (this.activeItem && this.activeItem.id === item.id) {
-      const index = list.indexOf(item);
+  getAllItems(): ListItem[] {
+    return [].concat(this.selected, this.available);
+  }
+
+  moveItem(key: KeyboardEvent) {
+    const selectedItem = this.focusManager.activeItem.value;
+    const index = this.focusManager.activeItemIndex;
+    const list = this.selected.find(s => s === selectedItem) ? this.selected : this.available;
       if (key.code === 'ArrowDown') {
         if (index === list.length - 1) {
           list.splice(index, 1);
-          list.unshift(item);
+          list.unshift(selectedItem);
+          this.focusManager.setNextItemActive();
         } else {
           const nextValue = list[index + 1];
           list.splice(index, 1, nextValue);
-          list[index + 1] = item;
+          list[index + 1] = selectedItem;
         }
       } else if (key.code === 'ArrowUp') {
         if (index === 0) {
           list.splice(index, 1);
-          list.push(item);
+          list.push(selectedItem);
         } else {
           const prevValue = list[index - 1];
           list.splice(index, 1, prevValue);
-          list[index - 1] = item;
-        }
-      } else if (key.code === 'ArrowRight' || key.code === 'ArrowLeft') {
-        if (listName === 'selected') {
-          this.selected.splice(index, 1);
-          this.available.splice(index, 0, item);
-        } else {
-          this.selected.splice(index, 0, item);
-          this.available.splice(index, 1);
+          list[index - 1] = selectedItem;
         }
       }
-      this.changeDetector.detectChanges();
-
-      const activeButton: HTMLButtonElement = this.container.nativeElement.querySelector('.active');
-      activeButton.focus();
-    }
    }
 
   drop(event: CdkDragDrop<string[]>) {
