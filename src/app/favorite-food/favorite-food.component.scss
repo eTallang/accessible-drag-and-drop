@@ -1,10 +1,13 @@
+$item-height: 60px;
+
 @mixin list-item-style() {
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: white;
   border: none;
-  padding: 20px;
+  padding: 0 20px;
+  height: $item-height;
   box-sizing: border-box;
   font-size: 14px;
 
@@ -30,6 +33,7 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     border-radius: 6px;
     overflow: hidden;
+    min-height: $item-height;
 
     &.cdk-drop-dragging {
       .list-item:not(.cdk-drag-placeholder) {
