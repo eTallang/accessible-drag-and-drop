@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { Component, OnInit, ElementRef, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDrop } from '@angular/cdk/drag-drop';
 
 interface ListItem {
   id: number;
@@ -12,6 +12,7 @@ interface ListItem {
   styleUrls: ['./favorite-food.component.scss']
 })
 export class FavoriteFoodComponent implements OnInit {
+  @ViewChild('container') container: ElementRef;
   activeItem: ListItem;
   selected: ListItem[] = [
     { id: 1, name: 'Taco' },
@@ -30,10 +31,60 @@ export class FavoriteFoodComponent implements OnInit {
     { id: 11, name: 'Grøt' },
     { id: 12, name: 'Fårikål' },
   ];
-  constructor() { }
+  constructor(private changeDetector: ChangeDetectorRef) { }
 
   ngOnInit() {
   }
+
+  activateItem(item: ListItem) {
+    if (!this.activeItem) {
+      this.activeItem = item;
+    } else {
+      if (item.id === this.activeItem.id) {
+        this.activeItem = null;
+      } else {
+        this.activeItem = item;
+      }
+    }
+  }
+
+  moveItem(listName: 'selected' | 'available', item: ListItem, key: KeyboardEvent, el: CdkDrop) {
+    const list = listName === 'selected' ? this.selected : this.available;
+    if (this.activeItem && this.activeItem.id === item.id) {
+      const index = list.indexOf(item);
+      if (key.code === 'ArrowDown') {
+        if (index === list.length - 1) {
+          list.splice(index, 1);
+          list.unshift(item);
+        } else {
+          const nextValue = list[index + 1];
+          list.splice(index, 1, nextValue);
+          list[index + 1] = item;
+        }
+      } else if (key.code === 'ArrowUp') {
+        if (index === 0) {
+          list.splice(index, 1);
+          list.push(item);
+        } else {
+          const prevValue = list[index - 1];
+          list.splice(index, 1, prevValue);
+          list[index - 1] = item;
+        }
+      } else if (key.code === 'ArrowRight' || key.code === 'ArrowLeft') {
+        if (listName === 'selected') {
+          this.selected.splice(index, 1);
+          this.available.splice(index, 0, item);
+        } else {
+          this.selected.splice(index, 0, item);
+          this.available.splice(index, 1);
+        }
+      }
+      this.changeDetector.detectChanges();
+
+      const activeButton: HTMLButtonElement = this.container.nativeElement.querySelector('.active');
+      activeButton.focus();
+    }
+   }
 
   drop(event: CdkDragDrop<string[]>) {
     if (event.previousContainer === event.container) {
