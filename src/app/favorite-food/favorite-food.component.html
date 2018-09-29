@@ -1,3 +1,18 @@
-<p>
-  favorite-food works!
-</p>
+<div class="column">
+  <h2>Valgt yndlingsmat</h2>
+  <cdk-drop #selectedList [connectedTo]="availableList" class="list" [data]="selected" (dropped)="drop($event)">
+    <button cdkDrag class="list-item" *ngFor="let selectedItem of selected">
+      <span>{{selectedItem.name}}</span>
+      <i class="material-icons">drag_indicator</i>
+    </button>
+  </cdk-drop>
+</div>
+<div class="column">
+  <h2>Tilgjengelig yndlingsmat</h2>
+  <cdk-drop #availableList [connectedTo]="selectedList" class="list" [data]="available" (dropped)="drop($event)">
+    <button cdkDrag class="list-item" *ngFor="let availableItem of available">
+      <span>{{availableItem.name}}</span>
+      <i class="material-icons">drag_indicator</i>
+    </button>
+  </cdk-drop>
+</div>
