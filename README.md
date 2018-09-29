@@ -1,27 +1,6 @@
-# AccessibleDragAndDrop
+# Accessible drag and drop demo
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.2.3.
+This is a demo on how to use drag and drop on a web page, and still make it accessible for those who prefer to use keyboard as their input method.
 
-## Development server
-
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+## Hos to use
+List items can be reordered or moved between lists by dragging and dropping using the mouse. The same functionality can be achieved using the keyboard by first selecting the item that should be moved, and then using the keyboard-arrows by moving the item up or down in the list, or between lists.
