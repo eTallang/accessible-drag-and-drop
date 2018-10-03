@@ -1,3 +1,18 @@
 .page-container {
     margin: 20px;
+
+    button {
+        border: none;
+        border-radius: 6px;
+        background: #3415ba;
+        color: white;
+        padding: 16px 32px;
+        margin: 40px 0;
+        cursor: pointer;
+
+        &:hover, &:focus {
+            background-color: #5435ff;
+            outline: none;
+        }
+    }
 }

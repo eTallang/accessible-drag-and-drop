@@ -36,36 +36,57 @@ export class FavoriteFoodComponent implements AfterViewInit {
     { id: 12, name: 'Fårikål' },
   ];
 
+  constructor(private changeDetector: ChangeDetectorRef) { }
+
   ngAfterViewInit() {
     this.focusManager = new ActiveDescendantKeyManager(this.listItems).withWrap().withTypeAhead();
   }
 
+  drop(event: CdkDragDrop<string[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    } else {
+      transferArrayItem(event.previousContainer.data,
+                        event.container.data,
+                        event.previousIndex,
+                        event.currentIndex);
+    }
+  }
+
   keydownhandler(event: KeyboardEvent) {
     if (event.code === 'Space' || event.code === 'Enter') {
+      event.preventDefault();
       if (this.activeItem === this.focusManager.activeItem.value) {
         this.activeItem = null;
       } else {
         this.activeItem = this.focusManager.activeItem.value;
       }
-    } else if ((event.code === 'ArrowUp' || event.code === 'ArrowDown') && this.activeItem) {
+    } else if (event.code.startsWith('Arrow') && this.activeItem) {
       this.moveItem(event);
+    } else if (event.code === 'ArrowRight' || event.code === 'ArrowLeft') {
+     this.moveFocus();
+    } else {
+      this.focusManager.onKeydown(event);
     }
-    this.focusManager.onKeydown(event);
   }
 
-  getAllItems(): ListItem[] {
-    return [].concat(this.selected, this.available);
+  private moveFocus(): void {
+    const indexInAvailableList = this.available.indexOf(this.focusManager.activeItem.value);
+    if (indexInAvailableList === -1) {
+      this.focusManager.setActiveItem(this.available.length + this.focusManager.activeItemIndex);
+    } else {
+      this.focusManager.setActiveItem(indexInAvailableList);
+    }
   }
 
-  moveItem(key: KeyboardEvent) {
+  private moveItem(key: KeyboardEvent): void {
     const selectedItem = this.focusManager.activeItem.value;
-    const index = this.focusManager.activeItemIndex;
     const list = this.selected.find(s => s === selectedItem) ? this.selected : this.available;
+    const index = list.indexOf(selectedItem);
       if (key.code === 'ArrowDown') {
         if (index === list.length - 1) {
           list.splice(index, 1);
           list.unshift(selectedItem);
-          this.focusManager.setNextItemActive();
         } else {
           const nextValue = list[index + 1];
           list.splice(index, 1, nextValue);
@@ -80,17 +101,17 @@ export class FavoriteFoodComponent implements AfterViewInit {
           list.splice(index, 1, prevValue);
           list[index - 1] = selectedItem;
         }
+      } else if (key.code === 'ArrowRight' || key.code === 'ArrowLeft') {
+        if (this.selected.find(s => s === selectedItem)) {
+          this.selected.splice(index, 1);
+          this.available.splice(index, 0, selectedItem);
+        } else {
+          this.available.splice(index, 1);
+          this.selected.splice(index, 0, selectedItem);
+        }
+        this.changeDetector.detectChanges();
+        const arrays = [].concat(this.selected, this.available);
+        this.focusManager.setActiveItem(arrays.indexOf(selectedItem));
       }
    }
-
-  drop(event: CdkDragDrop<string[]>) {
-    if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-    } else {
-      transferArrayItem(event.previousContainer.data,
-                        event.container.data,
-                        event.previousIndex,
-                        event.currentIndex);
-    }
-  }
 }

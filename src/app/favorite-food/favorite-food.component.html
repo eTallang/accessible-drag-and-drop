@@ -3,21 +3,21 @@
   <div class="column" role="listbox">
     <h3>Yndlingsretter</h3>
     <cdk-drop #selectedList [connectedTo]="availableList" class="list" [data]="selected" (dropped)="drop($event)">
-      <div role="listitem" cdkDrag appListItem [value]="selectedItem" class="list-item" *ngFor="let selectedItem of selected"
+      <button tabindex="-1" role="listitem" cdkDrag appListItem [value]="selectedItem" class="list-item" *ngFor="let selectedItem of selected"
         [class.active]="activeItem === selectedItem">
         <span>{{selectedItem.name}}</span>
         <i class="material-icons">drag_indicator</i>
-      </div>
+      </button>
     </cdk-drop>
   </div>
   <div class="column" role="listbox">
     <h3>Tilgjengelig</h3>
     <cdk-drop #availableList [connectedTo]="selectedList" class="list" [data]="available" (dropped)="drop($event)">
-      <div role="listitem" cdkDrag appListItem [value]="availableItem" class="list-item" *ngFor="let availableItem of available"
+      <button tabindex="-1" role="listitem" cdkDrag appListItem [value]="availableItem" class="list-item" *ngFor="let availableItem of available"
         [class.active]="activeItem === availableItem">
         <span>{{availableItem.name}}</span>
         <i class="material-icons">drag_indicator</i>
-      </div>
+      </button>
     </cdk-drop>
   </div>
 </div>
