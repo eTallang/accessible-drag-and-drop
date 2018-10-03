@@ -1,4 +1,12 @@
-import { Component, ElementRef, ChangeDetectorRef, ViewChild, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ChangeDetectorRef,
+  ViewChild,
+  ViewChildren,
+  QueryList,
+  AfterViewInit
+} from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ListItemDirective } from './list-item.directive';
 import { ActiveDescendantKeyManager } from '@angular/cdk/a11y';
@@ -15,8 +23,10 @@ export interface ListItem {
   styleUrls: ['./favorite-food.component.scss']
 })
 export class FavoriteFoodComponent implements AfterViewInit {
-  @ViewChild('container') container: ElementRef;
-  @ViewChildren(ListItemDirective) listItems: QueryList<ListItemDirective>;
+  @ViewChild('container')
+  container: ElementRef;
+  @ViewChildren(ListItemDirective)
+  listItems: QueryList<ListItemDirective>;
   focusManager: ActiveDescendantKeyManager<ListItemDirective>;
   activeItem: ListItem;
   selected: ListItem[] = [
@@ -25,7 +35,7 @@ export class FavoriteFoodComponent implements AfterViewInit {
     { id: 3, name: 'Laks' },
     { id: 4, name: 'Lasagne' },
     { id: 5, name: 'Pizza' },
-    { id: 6, name: 'Hamburger' },
+    { id: 6, name: 'Hamburger' }
   ];
 
   available: ListItem[] = [
@@ -34,10 +44,10 @@ export class FavoriteFoodComponent implements AfterViewInit {
     { id: 9, name: 'Indrefilet' },
     { id: 10, name: 'Wok' },
     { id: 11, name: 'Grøt' },
-    { id: 12, name: 'Fårikål' },
+    { id: 12, name: 'Fårikål' }
   ];
 
-  constructor(private changeDetector: ChangeDetectorRef) { }
+  constructor(private changeDetector: ChangeDetectorRef) {}
 
   ngAfterViewInit() {
     this.focusManager = new ActiveDescendantKeyManager(this.listItems).withWrap().withTypeAhead();
@@ -47,15 +57,13 @@ export class FavoriteFoodComponent implements AfterViewInit {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
-      transferArrayItem(event.previousContainer.data,
-                        event.container.data,
-                        event.previousIndex,
-                        event.currentIndex);
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
     }
-  }
-
-  setChecked(listItem: ListItem, checked: boolean): void {
-    listItem.selected = checked;
   }
 
   keydownhandler(event: KeyboardEvent) {
@@ -70,19 +78,46 @@ export class FavoriteFoodComponent implements AfterViewInit {
       }
     } else if (event.code.startsWith('Arrow') && this.activeItem) {
       this.moveItem(event);
-    } else if (event.code === 'ArrowRight' || event.code === 'ArrowLeft') {
-     this.moveFocus();
+    } else if (event.code.startsWith('Arrow')) {
+      this.moveFocus(event);
     } else {
       this.focusManager.onKeydown(event);
     }
   }
 
-  private moveFocus(): void {
-    const indexInAvailableList = this.available.indexOf(this.focusManager.activeItem.value);
-    if (indexInAvailableList === -1) {
-      this.focusManager.setActiveItem(this.available.length + this.focusManager.activeItemIndex);
-    } else {
-      this.focusManager.setActiveItem(indexInAvailableList);
+  private moveFocus(event: KeyboardEvent): void {
+    const list = this.selected.find(s => s === this.focusManager.activeItem.value) ? this.selected : this.available;
+    if (event.code === 'ArrowDown') {
+      if (list === this.selected && this.focusManager.activeItemIndex + 1 === this.selected.length) {
+        this.focusManager.setFirstItemActive();
+      } else if (list === this.available && this.focusManager.activeItemIndex + 1 === (this.available.length + this.selected.length)) {
+        this.focusManager.setActiveItem(this.selected.length);
+      } else {
+        this.focusManager.setNextItemActive();
+      }
+    } else if (event.code === 'ArrowUp') {
+      if (list === this.selected && this.focusManager.activeItemIndex === 0) {
+        this.focusManager.setActiveItem(this.selected.length - 1);
+      } else if (list === this.available && this.focusManager.activeItemIndex === this.selected.length) {
+        this.focusManager.setLastItemActive();
+      } else {
+        this.focusManager.setPreviousItemActive();
+      }
+    } else if (event.code === 'ArrowLeft' ||  event.code === 'ArrowRight') {
+      const indexInAvailableList = this. available.indexOf(this.focusManager.activeItem.value);
+      if (indexInAvailableList === -1) {
+        if (this.focusManager.activeItemIndex > this.available.length - 1) {
+          this.focusManager.setLastItemActive();
+        } else {
+          this.focusManager.setActiveItem(this.selected.length + this.focusManager.activeItemIndex);
+        }
+      } else {
+        if (indexInAvailableList > this.selected.length - 1) {
+          this.focusManager.setActiveItem(this.selected.length - 1);
+        } else {
+          this.focusManager.setActiveItem(indexInAvailableList);
+        }
+      }
     }
   }
 
@@ -90,35 +125,35 @@ export class FavoriteFoodComponent implements AfterViewInit {
     const selectedItem = this.focusManager.activeItem.value;
     const list = this.selected.find(s => s === selectedItem) ? this.selected : this.available;
     const index = list.indexOf(selectedItem);
-      if (key.code === 'ArrowDown') {
-        if (index === list.length - 1) {
-          list.splice(index, 1);
-          list.unshift(selectedItem);
-        } else {
-          const nextValue = list[index + 1];
-          list.splice(index, 1, nextValue);
-          list[index + 1] = selectedItem;
-        }
-      } else if (key.code === 'ArrowUp') {
-        if (index === 0) {
-          list.splice(index, 1);
-          list.push(selectedItem);
-        } else {
-          const prevValue = list[index - 1];
-          list.splice(index, 1, prevValue);
-          list[index - 1] = selectedItem;
-        }
-      } else if (key.code === 'ArrowRight' || key.code === 'ArrowLeft') {
-        if (this.selected.find(s => s === selectedItem)) {
-          this.selected.splice(index, 1);
-          this.available.splice(index, 0, selectedItem);
-        } else {
-          this.available.splice(index, 1);
-          this.selected.splice(index, 0, selectedItem);
-        }
-        this.changeDetector.detectChanges();
-        const arrays = [].concat(this.selected, this.available);
-        this.focusManager.setActiveItem(arrays.indexOf(selectedItem));
+    if (key.code === 'ArrowDown') {
+      if (index === list.length - 1) {
+        list.splice(index, 1);
+        list.unshift(selectedItem);
+      } else {
+        const nextValue = list[index + 1];
+        list.splice(index, 1, nextValue);
+        list[index + 1] = selectedItem;
       }
-   }
+    } else if (key.code === 'ArrowUp') {
+      if (index === 0) {
+        list.splice(index, 1);
+        list.push(selectedItem);
+      } else {
+        const prevValue = list[index - 1];
+        list.splice(index, 1, prevValue);
+        list[index - 1] = selectedItem;
+      }
+    } else if (key.code === 'ArrowRight' || key.code === 'ArrowLeft') {
+      if (this.selected.find(s => s === selectedItem)) {
+        this.selected.splice(index, 1);
+        this.available.splice(index, 0, selectedItem);
+      } else {
+        this.available.splice(index, 1);
+        this.selected.splice(index, 0, selectedItem);
+      }
+      this.changeDetector.detectChanges();
+      const arrays = [].concat(this.selected, this.available);
+      this.focusManager.setActiveItem(arrays.indexOf(selectedItem));
+    }
+  }
 }
