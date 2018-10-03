@@ -1,11 +1,12 @@
-import { Component, OnInit, ElementRef, ChangeDetectorRef, ViewChild, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
-import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDrop } from '@angular/cdk/drag-drop';
+import { Component, ElementRef, ChangeDetectorRef, ViewChild, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ListItemDirective } from './list-item.directive';
 import { ActiveDescendantKeyManager } from '@angular/cdk/a11y';
 
 export interface ListItem {
   id: number;
   name: string;
+  selected?: boolean;
 }
 
 @Component({
@@ -53,8 +54,14 @@ export class FavoriteFoodComponent implements AfterViewInit {
     }
   }
 
+  setChecked(listItem: ListItem, checked: boolean): void {
+    listItem.selected = checked;
+  }
+
   keydownhandler(event: KeyboardEvent) {
-    if (event.code === 'Space' || event.code === 'Enter') {
+    if (event.code === 'Enter') {
+      this.focusManager.activeItem.value.selected = !this.focusManager.activeItem.value.selected;
+    } else if (event.code === 'Space') {
       event.preventDefault();
       if (this.activeItem === this.focusManager.activeItem.value) {
         this.activeItem = null;

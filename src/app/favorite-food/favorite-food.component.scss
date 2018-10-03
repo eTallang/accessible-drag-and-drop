@@ -15,6 +15,17 @@ $border-radius: 6px;
   .material-icons {
     opacity: 0.5;
     font-size: 0.9rem;
+    cursor: grab;
+  }
+  
+  span {
+    flex: auto;
+    text-align: left;
+  }
+
+  mat-checkbox {
+    margin-top: -2px;
+    margin-right: 16px;
   }
 }
 
@@ -49,7 +60,6 @@ $border-radius: 6px;
     &-item {
       @include list-item-style();
       width: 100%;
-      cursor: grab;
       transition: background-color 0.1s ease, margin 0.1s ease;
 
       &.focused {
