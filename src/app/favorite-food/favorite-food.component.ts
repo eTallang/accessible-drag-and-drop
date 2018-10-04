@@ -78,8 +78,10 @@ export class FavoriteFoodComponent implements AfterViewInit {
       }
     } else if (event.code.startsWith('Arrow') && this.activeItem) {
       this.moveItem(event);
+      event.preventDefault();
     } else if (event.code.startsWith('Arrow')) {
       this.moveFocus(event);
+      event.preventDefault();
     } else {
       this.focusManager.onKeydown(event);
     }
