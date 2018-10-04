@@ -1,12 +1,11 @@
-<div tabindex="0" (keydown)="keydownhandler($event)" (focus)="focusManager.setFirstItemActive()"
-  (blur)="focusManager.setActiveItem(-1)">
-  <div class="column" role="listbox">
+<div tabindex="0" (keydown)="keydownhandler($event)">
+  <div class="column">
     <div class="header">
       <h3>Hverdagsmat</h3>
       <span>Favoritt</span>
     </div>
-    <cdk-drop #selectedList [connectedTo]="availableList" class="list" [data]="selected" (dropped)="drop($event)">
-      <div role="listitem" cdkDrag appListItem [value]="selectedItem" class="list-item" *ngFor="let selectedItem of selected"
+    <cdk-drop role="listbox" #selectedList [connectedTo]="availableList" class="list" [data]="selected" (dropped)="drop($event)">
+      <div role="listitem" tabindex="-1" cdkDrag [value]="selectedItem" class="list-item" *ngFor="let selectedItem of selected"
         [class.active]="activeItem === selectedItem">
         <span cdkDragHandle>{{selectedItem.name}}</span>
         <mat-slide-toggle tabindex="-1" (change)="selectedItem.selected = $event.checked" [checked]="selectedItem.selected"></mat-slide-toggle>
@@ -14,13 +13,13 @@
       </div>
     </cdk-drop>
   </div>
-  <div class="column" role="listbox">
+  <div class="column">
     <div class="header">
       <h3>Helgemat</h3>
       <span>Favoritt</span>
     </div>
-    <cdk-drop #availableList [connectedTo]="selectedList" class="list" [data]="available" (dropped)="drop($event)">
-      <div role="listitem" cdkDrag appListItem [value]="availableItem" class="list-item" *ngFor="let availableItem of available"
+    <cdk-drop role="listbox" #availableList [connectedTo]="selectedList" class="list" [data]="available" (dropped)="drop($event)">
+      <div role="listitem" tabindex="-1" cdkDrag [value]="availableItem" class="list-item" *ngFor="let availableItem of available"
         [class.active]="activeItem === availableItem">
         <span cdkDragHandle>{{availableItem.name}}</span>
         <mat-slide-toggle tabindex="-1" (change)="availableItem.selected = $event.checked" [checked]="availableItem.selected"></mat-slide-toggle>

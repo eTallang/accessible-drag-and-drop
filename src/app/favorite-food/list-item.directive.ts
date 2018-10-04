@@ -1,28 +1,21 @@
-import { Directive, HostBinding, Input } from '@angular/core';
-import { Highlightable } from '@angular/cdk/a11y';
+import { Directive, Input, ElementRef } from '@angular/core';
+import { FocusableOption, FocusOrigin } from '@angular/cdk/a11y';
 import { ListItem } from './favorite-food.component';
 
 @Directive({
-  selector: '[appListItem]'
+  // tslint:disable-next-line:directive-selector
+  selector: '[role="listitem"]'
 })
-export class ListItemDirective implements Highlightable {
-  isActive = false;
-  disabled?: boolean;
-
-  @HostBinding('class.focused')
-  get focusedClass() {
-    return this.isActive;
-  }
-
+export class ListItemDirective implements FocusableOption {
   @Input() value: ListItem;
 
-  setActiveStyles(): void {
-    this.isActive = true;
-  }
-  setInactiveStyles(): void {
-    this.isActive = false;
-  }
-  getLabel?(): string {
+  constructor(private elementRef: ElementRef<HTMLDivElement>) { }
+
+  getLabel(): string {
     return this.value && this.value.name;
+  }
+
+  focus(origin?: FocusOrigin): void {
+    this.elementRef.nativeElement.focus();
   }
 }

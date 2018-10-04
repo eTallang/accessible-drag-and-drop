@@ -85,10 +85,11 @@ $border-radius: 6px;
     &-item {
       @include list-item-style();
       width: 100%;
-      transition: background-color 0.1s ease, margin 0.1s ease;
+      transition: margin 0.1s ease;
 
-      &.focused {
+      &:focus, &:hover {
         background-color: #efefef;
+        outline: none;
       }
 
       &.active {

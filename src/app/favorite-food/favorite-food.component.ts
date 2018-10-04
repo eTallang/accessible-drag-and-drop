@@ -1,15 +1,13 @@
 import {
   Component,
-  ElementRef,
   ChangeDetectorRef,
-  ViewChild,
   ViewChildren,
   QueryList,
   AfterViewInit
 } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ListItemDirective } from './list-item.directive';
-import { ActiveDescendantKeyManager } from '@angular/cdk/a11y';
+import { FocusKeyManager } from '@angular/cdk/a11y';
 
 export interface ListItem {
   id: number;
@@ -23,12 +21,10 @@ export interface ListItem {
   styleUrls: ['./favorite-food.component.scss']
 })
 export class FavoriteFoodComponent implements AfterViewInit {
-  @ViewChild('container')
-  container: ElementRef;
   @ViewChildren(ListItemDirective)
   listItems: QueryList<ListItemDirective>;
-  focusManager: ActiveDescendantKeyManager<ListItemDirective>;
   activeItem: ListItem;
+  focusManager: FocusKeyManager<ListItemDirective>;
   selected: ListItem[] = [
     { id: 1, name: 'Taco' },
     { id: 2, name: 'Kjøttkaker' },
@@ -50,7 +46,7 @@ export class FavoriteFoodComponent implements AfterViewInit {
   constructor(private changeDetector: ChangeDetectorRef) {}
 
   ngAfterViewInit() {
-    this.focusManager = new ActiveDescendantKeyManager(this.listItems).withWrap().withTypeAhead();
+    this.focusManager = new FocusKeyManager<ListItemDirective>(this.listItems).withWrap().withTypeAhead();
   }
 
   drop(event: CdkDragDrop<string[]>) {
@@ -67,27 +63,39 @@ export class FavoriteFoodComponent implements AfterViewInit {
   }
 
   keydownhandler(event: KeyboardEvent) {
-    if (event.code === 'Space') {
-      event.preventDefault();
-      this.focusManager.activeItem.value.selected = !this.focusManager.activeItem.value.selected;
-    } else if (event.code === 'Enter') {
-      if (this.activeItem === this.focusManager.activeItem.value) {
-        this.activeItem = null;
-      } else {
-        this.activeItem = this.focusManager.activeItem.value;
-      }
-    } else if (event.code.startsWith('Arrow') && this.activeItem) {
-      this.moveItem(event);
-      event.preventDefault();
-    } else if (event.code.startsWith('Arrow')) {
-      this.moveFocus(event);
-      event.preventDefault();
-    } else {
+    switch (event.code) {
+      case 'Space':
+        event.preventDefault();
+        this.focusManager.activeItem.value.selected = !this.focusManager.activeItem.value.selected;
+        break;
+      case 'Enter':
+        if (this.activeItem === this.focusManager.activeItem.value) {
+          this.activeItem = null;
+        } else {
+          this.activeItem = this.focusManager.activeItem.value;
+        }
+        break;
+      case 'ArrowLeft':
+      case 'ArrowRight':
+      case 'ArrowUp':
+      case 'ArrowDown':
+        event.preventDefault();
+        if (this.activeItem) {
+          this.moveItem(event);
+        } else {
+          this.moveFocus(event);
+        }
+        break;
+      default:
       this.focusManager.onKeydown(event);
     }
   }
 
   private moveFocus(event: KeyboardEvent): void {
+    if (!this.focusManager.activeItem) {
+      this.focusManager.setFirstItemActive();
+      return;
+    }
     const list = this.selected.find(s => s === this.focusManager.activeItem.value) ? this.selected : this.available;
     if (event.code === 'ArrowDown') {
       if (list === this.selected && this.focusManager.activeItemIndex + 1 === this.selected.length) {
