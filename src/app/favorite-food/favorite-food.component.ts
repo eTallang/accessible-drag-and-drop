@@ -46,7 +46,9 @@ export class FavoriteFoodComponent implements AfterViewInit {
   constructor(private changeDetector: ChangeDetectorRef) {}
 
   ngAfterViewInit() {
-    this.focusManager = new FocusKeyManager<ListItemDirective>(this.listItems).withWrap().withTypeAhead();
+    this.focusManager = new FocusKeyManager<ListItemDirective>(this.listItems)
+      .withWrap()
+      .withTypeAhead();
   }
 
   drop(event: CdkDragDrop<string[]>) {
@@ -87,7 +89,7 @@ export class FavoriteFoodComponent implements AfterViewInit {
         }
         break;
       default:
-      this.focusManager.onKeydown(event);
+        this.focusManager.onKeydown(event);
     }
   }
 
@@ -96,38 +98,56 @@ export class FavoriteFoodComponent implements AfterViewInit {
       this.focusManager.setFirstItemActive();
       return;
     }
-    const list = this.selected.find(s => s === this.focusManager.activeItem.value) ? this.selected : this.available;
-    if (event.code === 'ArrowDown') {
-      if (list === this.selected && this.focusManager.activeItemIndex + 1 === this.selected.length) {
-        this.focusManager.setFirstItemActive();
-      } else if (list === this.available && this.focusManager.activeItemIndex + 1 === (this.available.length + this.selected.length)) {
-        this.focusManager.setActiveItem(this.selected.length);
-      } else {
-        this.focusManager.setNextItemActive();
-      }
-    } else if (event.code === 'ArrowUp') {
-      if (list === this.selected && this.focusManager.activeItemIndex === 0) {
-        this.focusManager.setActiveItem(this.selected.length - 1);
-      } else if (list === this.available && this.focusManager.activeItemIndex === this.selected.length) {
-        this.focusManager.setLastItemActive();
-      } else {
-        this.focusManager.setPreviousItemActive();
-      }
-    } else if (event.code === 'ArrowLeft' ||  event.code === 'ArrowRight') {
-      const indexInAvailableList = this. available.indexOf(this.focusManager.activeItem.value);
-      if (indexInAvailableList === -1) {
-        if (this.focusManager.activeItemIndex > this.available.length - 1) {
+    const list = this.selected.find(s => s === this.focusManager.activeItem.value)
+      ? this.selected
+      : this.available;
+    switch (event.code) {
+      case 'ArrowDown':
+        if (
+          list === this.selected &&
+          this.focusManager.activeItemIndex + 1 === this.selected.length
+        ) {
+          this.focusManager.setFirstItemActive();
+        } else if (
+          list === this.available &&
+          this.focusManager.activeItemIndex + 1 === this.available.length + this.selected.length
+        ) {
+          this.focusManager.setActiveItem(this.selected.length);
+        } else {
+          this.focusManager.setNextItemActive();
+        }
+        break;
+      case 'ArrowUp':
+        if (list === this.selected && this.focusManager.activeItemIndex === 0) {
+          this.focusManager.setActiveItem(this.selected.length - 1);
+        } else if (
+          list === this.available &&
+          this.focusManager.activeItemIndex === this.selected.length
+        ) {
           this.focusManager.setLastItemActive();
         } else {
-          this.focusManager.setActiveItem(this.selected.length + this.focusManager.activeItemIndex);
+          this.focusManager.setPreviousItemActive();
         }
-      } else {
-        if (indexInAvailableList > this.selected.length - 1) {
-          this.focusManager.setActiveItem(this.selected.length - 1);
+        break;
+      case 'ArrowLeft':
+      case 'ArrowRight':
+        const indexInAvailableList = this.available.indexOf(this.focusManager.activeItem.value);
+        if (indexInAvailableList === -1) {
+          if (this.focusManager.activeItemIndex > this.available.length - 1) {
+            this.focusManager.setLastItemActive();
+          } else {
+            this.focusManager.setActiveItem(
+              this.selected.length + this.focusManager.activeItemIndex
+            );
+          }
         } else {
-          this.focusManager.setActiveItem(indexInAvailableList);
+          if (indexInAvailableList > this.selected.length - 1) {
+            this.focusManager.setActiveItem(this.selected.length - 1);
+          } else {
+            this.focusManager.setActiveItem(indexInAvailableList);
+          }
         }
-      }
+        break;
     }
   }
 
@@ -135,35 +155,40 @@ export class FavoriteFoodComponent implements AfterViewInit {
     const selectedItem = this.focusManager.activeItem.value;
     const list = this.selected.find(s => s === selectedItem) ? this.selected : this.available;
     const index = list.indexOf(selectedItem);
-    if (key.code === 'ArrowDown') {
-      if (index === list.length - 1) {
-        list.splice(index, 1);
-        list.unshift(selectedItem);
-      } else {
-        const nextValue = list[index + 1];
-        list.splice(index, 1, nextValue);
-        list[index + 1] = selectedItem;
-      }
-    } else if (key.code === 'ArrowUp') {
-      if (index === 0) {
-        list.splice(index, 1);
-        list.push(selectedItem);
-      } else {
-        const prevValue = list[index - 1];
-        list.splice(index, 1, prevValue);
-        list[index - 1] = selectedItem;
-      }
-    } else if (key.code === 'ArrowRight' || key.code === 'ArrowLeft') {
-      if (this.selected.find(s => s === selectedItem)) {
-        this.selected.splice(index, 1);
-        this.available.splice(index, 0, selectedItem);
-      } else {
-        this.available.splice(index, 1);
-        this.selected.splice(index, 0, selectedItem);
+    switch (key.code) {
+      case 'ArrowDown':
+        if (index === list.length - 1) {
+          list.splice(index, 1);
+          list.unshift(selectedItem);
+        } else {
+          const nextValue = list[index + 1];
+          list.splice(index, 1, nextValue);
+          list[index + 1] = selectedItem;
+        }
+        break;
+      case 'ArrowUp':
+        if (index === 0) {
+          list.splice(index, 1);
+          list.push(selectedItem);
+        } else {
+          const prevValue = list[index - 1];
+          list.splice(index, 1, prevValue);
+          list[index - 1] = selectedItem;
+        }
+        break;
+      case 'ArrowLeft':
+      case 'ArrowRight':
+        if (this.selected.find(s => s === selectedItem)) {
+          this.selected.splice(index, 1);
+          this.available.splice(index, 0, selectedItem);
+        } else {
+          this.available.splice(index, 1);
+          this.selected.splice(index, 0, selectedItem);
+        }
+        break;
       }
       this.changeDetector.detectChanges();
       const arrays = [].concat(this.selected, this.available);
       this.focusManager.setActiveItem(arrays.indexOf(selectedItem));
-    }
   }
 }

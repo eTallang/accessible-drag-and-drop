@@ -43,18 +43,18 @@ $border-radius: 6px;
   display: flex;
   flex-direction: row;
   align-items: flex-end;
+  justify-content: space-between;
   margin: 1em 0;
 
   h3 {
-    flex: 2.2;
     margin: 0;
   }
 
   span {
-    flex: 1;
     margin: 0;
     font-size: 1rem;
     font-weight: bold;
+    margin-right: 68px;
   }
 }
 
@@ -84,7 +84,6 @@ $border-radius: 6px;
 
     &-item {
       @include list-item-style();
-      width: 100%;
       transition: margin 0.1s ease;
 
       &:focus, &:hover {
@@ -94,7 +93,7 @@ $border-radius: 6px;
 
       &.active {
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-        margin: 6px 0;
+        margin: 10px 0;
       }
 
       &:not(:last-of-type) {
