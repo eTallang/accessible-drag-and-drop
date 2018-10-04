@@ -1,31 +1,41 @@
 $item-height: 60px;
 $border-radius: 6px;
 
-@mixin list-item-style() {
+@mixin centerVertically() {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+}
+
+@mixin list-item-style() {
+  @include centerVertically();
   background: white;
   border: none;
-  padding: 0 20px;
   height: $item-height;
   box-sizing: border-box;
   font-size: 14px;
+  cursor: grab;
 
-  .material-icons {
-    opacity: 0.5;
-    font-size: 0.9rem;
-    cursor: grab;
-  }
-  
   span {
+    @include centerVertically();
     flex: auto;
+    height: $item-height;
+    padding-left: 20px;
     text-align: left;
   }
 
-  mat-checkbox {
-    margin-top: -2px;
-    margin-right: 52px;
+  mat-slide-toggle {
+    display: block;
+    padding: 10px;
+    z-index: 888;
+  }
+  
+  i {
+    @include centerVertically();
+    opacity: 0.5;
+    font-size: 0.9rem;
+    padding-left: 36px;
+    height: $item-height;
+    padding-right: 20px;
   }
 }
 

@@ -8,8 +8,8 @@
     <cdk-drop #selectedList [connectedTo]="availableList" class="list" [data]="selected" (dropped)="drop($event)">
       <div role="listitem" cdkDrag appListItem [value]="selectedItem" class="list-item" *ngFor="let selectedItem of selected"
         [class.active]="activeItem === selectedItem">
-        <span>{{selectedItem.name}}</span>
-        <mat-checkbox tabindex="-1" (change)="selectedItem.selected = $event.checked" [checked]="selectedItem.selected"></mat-checkbox>
+        <span cdkDragHandle>{{selectedItem.name}}</span>
+        <mat-slide-toggle tabindex="-1" (change)="selectedItem.selected = $event.checked" [checked]="selectedItem.selected"></mat-slide-toggle>
         <i class="material-icons" cdkDragHandle>drag_indicator</i>
       </div>
     </cdk-drop>
@@ -22,8 +22,8 @@
     <cdk-drop #availableList [connectedTo]="selectedList" class="list" [data]="available" (dropped)="drop($event)">
       <div role="listitem" cdkDrag appListItem [value]="availableItem" class="list-item" *ngFor="let availableItem of available"
         [class.active]="activeItem === availableItem">
-        <span>{{availableItem.name}}</span>
-        <mat-checkbox tabindex="-1" (change)="availableItem.selected = $event.checked" [checked]="availableItem.selected"></mat-checkbox>
+        <span cdkDragHandle>{{availableItem.name}}</span>
+        <mat-slide-toggle tabindex="-1" (change)="availableItem.selected = $event.checked" [checked]="availableItem.selected"></mat-slide-toggle>
         <i class="material-icons" cdkDragHandle>drag_indicator</i>
       </div>
     </cdk-drop>
