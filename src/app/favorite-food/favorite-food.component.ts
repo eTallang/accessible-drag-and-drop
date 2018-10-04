@@ -67,10 +67,10 @@ export class FavoriteFoodComponent implements AfterViewInit {
   }
 
   keydownhandler(event: KeyboardEvent) {
-    if (event.code === 'Enter') {
-      this.focusManager.activeItem.value.selected = !this.focusManager.activeItem.value.selected;
-    } else if (event.code === 'Space') {
+    if (event.code === 'Space') {
       event.preventDefault();
+      this.focusManager.activeItem.value.selected = !this.focusManager.activeItem.value.selected;
+    } else if (event.code === 'Enter') {
       if (this.activeItem === this.focusManager.activeItem.value) {
         this.activeItem = null;
       } else {
